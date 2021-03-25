@@ -1,0 +1,55 @@
+---
+title: "introduction"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Load the library
+```{r setup}
+devtools::load_all()
+#library(vectorParseDate)
+```
+
+## parse a vector of dates, in unkown format
+
+```{r}
+dts = c("03/03/92", "03/21/94", "03/02/99", "03/07/02")
+vectorParseDate::vector_parse_dates(dts)
+```
+
+##This generated this file
+
+```{r}
+ #usethis::use_vignette("introduction")
+
+```
+
+### this loads the package
+```{r}
+  #devtools::load_all()
+```
+
+
+### installs the package
+```{r}
+  #devtools::install(pkg = "C:/Users/hswerdfe/Projects/vectorParseDate")
+```
+### documents the package
+
+```{r}
+  devtools::document()
+```
+```{r}
+usethis::use_testthat()
+```
+

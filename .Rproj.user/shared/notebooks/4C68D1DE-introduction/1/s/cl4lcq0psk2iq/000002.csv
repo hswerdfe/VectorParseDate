@@ -1,0 +1,19 @@
+"0","devtools::document()
+"
+"2","Updating VectorParseDate documentation
+"
+"2","roxygen2 requires Encoding: UTF-8"
+"2","Loading VectorParseDate
+"
+"2","[C:\Users\hswerdfe\Projects\vectorParseDate\R\vector_parse_date.R:8] @export may only span a single line"
+"2","[C:\Users\hswerdfe\Projects\vectorParseDate\R\vector_parse_date.R:97] @year unknown tag"
+"2","[C:\Users\hswerdfe\Projects\vectorParseDate\R\vector_parse_date.R:110] @param requires name and description"
+"2","[C:\Users\hswerdfe\Projects\vectorParseDate\R\vector_parse_date.R:111] @param requires name and description"
+"2","[C:\Users\hswerdfe\Projects\vectorParseDate\R\vector_parse_date.R:112] @param requires name and description"
+"2","[C:\Users\hswerdfe\Projects\vectorParseDate\R\vector_parse_date.R:145] @check unknown tag"
+"2","[C:\Users\hswerdfe\Projects\vectorParseDate\R\vector_parse_date.R:146] @ unknown tag"
+"2","[C:\Users\hswerdfe\Projects\vectorParseDate\R\vector_parse_date.R:186] @check unknown tag"
+"1","Writing NAMESPACE
+"
+"1","Writing NAMESPACE
+"
