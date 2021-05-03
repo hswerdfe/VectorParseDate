@@ -2,17 +2,24 @@
 % Please edit documentation in R/vector_parse_date.R
 \name{vector_parse_date_first_clean}
 \alias{vector_parse_date_first_clean}
-\title{cleans incoming dates a little bit so they are a little simmilar and we don't need to try as many formats}
+\title{cleans incoming dates a little bit so they are a little similar and we don't need to try as many formats}
 \usage{
-vector_parse_date_first_clean(dts, TIME_SPLIT = "T", seps = "[-.:/\\\\s+]")
+vector_parse_date_first_clean(
+  dts,
+  TIME_SPLIT = "T",
+  seps = "[-.:/\\\\s+]",
+  replace_sep = "-"
+)
 }
 \arguments{
 \item{dts}{vecotor of date strings}
 
 \item{TIME_SPLIT}{where to split to get rid of the time}
 
-\item{seps}{what the date seperators might be}
+\item{seps}{what the date separators might be}
+
+\item{replace_sep}{what to replace the seperators with}
 }
 \description{
-cleans incoming dates a little bit so they are a little simmilar and we don't need to try as many formats
+cleans incoming dates a little bit so they are a little similar and we don't need to try as many formats
 }

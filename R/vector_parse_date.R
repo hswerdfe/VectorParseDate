@@ -5,6 +5,12 @@ NULL
 
 #' vector formats that will be attempted by default
 #'
+#'
+#' @example
+#' vector_parse_date_formats()
+#'
+#'
+#'
 #' @export
 vector_parse_date_formats <- function(){
   unique(c(
@@ -18,65 +24,59 @@ vector_parse_date_formats <- function(){
     'ydb'
   ))
 
-  #' c(
-  #'   '%d-%b-%Y',
-  #'   #'%d %b %Y',
-  #'   #'%Y%m%d',
-  #'   '%d-%m-%y',
-  #'   '%y-%m-%d',
-  #'   '%m-%d-%y',
-  #'   '%y-%d-%m',
-  #'   #'%d-%m-%Y',
-  #'   #'%Y-%m-%d',
-  #'   #'%m-%d-%Y',
-  #'   #'%Y-%d-%m',
-  #'   '%d-%b-%y',
-  #'   '%y-%b-%d',
-  #'   '%b-%d-%y',
-  #'   '%y-%d-%b'#,
-  #'   #'%d-%b-%Y',
-  #'   #'%Y-%b-%d',
-  #'   #'%Y-%d-%b'
-  #' )
 }
 
 
 
 
-#' cleans incoming dates a little bit so they are a little simmilar and we don't need to try as many formats
+#' cleans incoming dates a little bit so they are a little similar and we don't need to try as many formats
 #'
 #' @param dts vecotor of date strings
 #' @param TIME_SPLIT where to split to get rid of the time
-#' @param seps what the date seperators might be
+#' @param seps what the date separators might be
+#' @param replace_sep what to replace the seperators with
+#'
+#' @example
+#'  vector_parse_date_first_clean( c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
+#'
 #'
 #' @export
 vector_parse_date_first_clean <- function(dts,
                                           TIME_SPLIT = 'T',
-                                          seps = '[-.:/\\s+]'){
+                                          seps = '[-.:/\\s+]',
+                                          replace_sep = "-"){
 
   stringr::str_split(dts,pattern = TIME_SPLIT, n = 1) %>%
     unlist() %>%
     stringr::str_trim() %>%
-    stringr::str_replace_all(pattern = seps, replacement = "-")
+    stringr::str_replace_all(pattern = seps, replacement = replace_sep)
 }
 
 
 
-
+#' Can be passed to multiple functions as the 'check_func' parameter,
 #' always returns true
 #'
 #' @param dt a POSIXct object
 #'
+#' @examples
+#'   vector_parse_date_usually_true(as.Date("2021-01-17"))
+#'   vector_parse_date_usually_true(as.Date("2037-01-17"))
+#'   vector_parse_date_usually_true(as.Date("1282-03-27"))
 #' @export
 vector_parse_date_usually_true <- function(dt){
   return(as.double(1))
 }
 
 
-
+#' Can be passed to multiple functions as the 'check_func' parameter,
 #' true if the date is in the past
 #'
 #' @param dt a POSIXct object
+#'
+#' @examples
+#'   vector_parse_date_not_future(as.Date("2021-01-17"))
+#'   vector_parse_date_not_future(as.Date("2037-01-17"))
 #'
 #' @export
 vector_parse_date_not_future <- function(dt){
@@ -84,6 +84,19 @@ vector_parse_date_not_future <- function(dt){
   return(as.double(dt <= Sys.Date()))
 }
 
+
+
+
+#############################
+#' Can be passed to multiple functions as the 'check_func' parameter,
+#' Returns a larger number for dates closer to the current date
+#'
+#' @param dt  a POSIXct object
+#'
+#' @example
+#'   vector_parse_recent_better(as.Date("2021-01-17"))
+#'
+#' @export
 vector_parse_recent_better <- function(dt){
   if (as.double(dt <= Sys.Date())){
     return(1.0/(1+as.double(difftime(Sys.Date(), dt, units = "days"))))
@@ -91,25 +104,35 @@ vector_parse_recent_better <- function(dt){
     return(0.0)
   }
 }
+
+#############################
 #' adjust years of a date that are feed in
 #'
 #' @param dt a single string that may be a date
-#' @year
+#' @param year_threshold  year where we will try to adjust by 100 years
 #'
 #' @export
 vector_parse_date_adust_year <- function(dt, year_threshold=1922){
-  m <- year(dt) %% 100
-  year(dt) <- ifelse(m > year_threshold %% 100, 1900+m, 2000+m)
+  m <- lubridate::year(dt) %% 100
+  lubridate::year(dt) <- ifelse(m > year_threshold %% 100, 1900+m, 2000+m)
   dt
 }
 
 #####################################
 #'
-#' return true if it is 4 digit year
+#' Internal function return true if it is 4 digit year
 #'
-#' @param dt_str
-#' @param fmt
-#' @param sep
+#' @param dt_str date string
+#' @param fmt format for the date string sometging like 'mdy'
+#' @param sep default separator
+#'
+#' @examples
+#' vector_parse_date_is_two_digit_year(dt_str = "03-22-97", fmt = 'mdy')
+#' vector_parse_date_is_two_digit_year(dt_str = "03-22-1997", fmt = 'mdy')
+#' vector_parse_date_is_two_digit_year(dt_str = "2035-01-29", fmt = 'ymd')
+#' vector_parse_date_is_two_digit_year(dt_str = "35-01-29", fmt = 'ymd')
+#'
+#'@export
 vector_parse_date_is_two_digit_year <- function(dt_str, fmt, sep = "-"){
   #dt_str = 19970422
   dt_str <- vector_parse_date_first_clean(dt_str)
@@ -129,21 +152,22 @@ vector_parse_date_is_two_digit_year <- function(dt_str, fmt, sep = "-"){
     )
 
   if(year_a == -1)
-    return(FALSE)
+    return(TRUE)
 
-  year_b = suppressWarnings(lubridate::parse_date_time(dt_str, fmt)) %>% year()%>% as.integer()
-  return(year_a == year_b)
+  year_b = suppressWarnings(lubridate::parse_date_time(dt_str, fmt)) %>% lubridate::year()%>% as.integer()
+  return(year_a != year_b)
 }
-
-#vector_parse_date_is_two_digit_year(dt_str = "03-22-97", fmt = 'mdy')
-#vector_parse_date_is_two_digit_year(dt_str = "03-22-1997", fmt = 'mdy')
 
 #' returns either NA or a date depending on if the dt_str and fmt make sense as a possible date
 #'
 #' @param dt_str a single string that may be a date
 #' @param fmt a single format to try
-#' @check_func function return 1 if the date parsed matches business logic
-#' @... passed to check_func
+#' @param check_func function return 1 if the date parsed matches business logic
+#' @param ... passed to check_func
+#'
+#' #' @example
+#'    vector_parse_date_only_one(dt_str="03/03/92", fmt="mdy")
+#'    vector_parse_date_only_one(dt_str="03/03/92", fmt="ymd")
 #'
 #' @export
 vector_parse_date_only_one <- function(dt_str, fmt, check_func = vector_parse_date_not_future, ...){
@@ -160,7 +184,7 @@ vector_parse_date_only_one <- function(dt_str, fmt, check_func = vector_parse_da
   }
   if( ! check_func(ret_dt, ...)){
     dt_str2 = vector_parse_date_first_clean(dt_str)
-    if (  vector_parse_date_is_two_digit_year(dt_str2, fmt)){
+    if (  vector_parse_date_is_two_digit_year(dt_str = dt_str2, fmt)){
       ret_dt = vector_parse_date_adust_year(ret_dt, ...)
     }
 
@@ -183,8 +207,12 @@ vector_parse_date_only_one <- function(dt_str, fmt, check_func = vector_parse_da
 #'
 #' @param dt_str a single string that may be a date
 #' @param fmt a single format to try
-#' @check_func function return true if the date parsed matches business logic
+#' @param check_func function return true if the date parsed matches business logic
+#' @param ... passed to vector_parse_date_only_one
 #'
+#' @examples
+#'    vector_parse_date_possibl_correct_format(dt_str="03/03/92", fmt="mdy")
+#'    vector_parse_date_possibl_correct_format(dt_str="03/03/92", fmt="ymd")
 #' @export
 vector_parse_date_possibl_correct_format <- function(dt_str, fmt, check_func = vector_parse_date_not_future, ...){
   #dt_str = "4-17-90"
@@ -203,6 +231,8 @@ vector_parse_date_possibl_correct_format <- function(dt_str, fmt, check_func = v
 #' @param dts vector of strings
 #' @param fmts optional vector of formats to check
 #' @param check_func function that takes a date and returns 1 if if matches some business logic for a valid date
+#' @example
+#'    vector_parse_success_grid(dts=c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
 #'
 #' @export
 vector_parse_success_grid <- function(dts,
@@ -239,6 +269,8 @@ vector_parse_success_grid <- function(dts,
 #' @param fmts optional vector of formats to check
 #' @param check_func function that takes a date and returns 1 if if matches some business logic for a valid date
 #'
+#' @example
+#'   vector_parse_success_rates(dts=c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
 #' @export
 vector_parse_success_rates <- function(dts,
                                        fmts= vector_parse_date_formats(),
@@ -266,6 +298,8 @@ vector_parse_success_rates <- function(dts,
 #' @param fmts optional vector of formats to check
 #' @param check_func function that takes a date and returns 1 if if matches some business logic for a valid date
 #'
+#' @example
+#'   vector_parse_dates_guess_at_format(dts=c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
 #' @export
 vector_parse_dates_guess_at_format <- function(dts,
                                               fmts= vector_parse_date_formats(),
@@ -295,13 +329,16 @@ vector_parse_dates_guess_at_format <- function(dts,
 
 
 
-#' given a vector of dates this will try to parse them using vector of formats, and then parse them as best it can using information on if the other dates parse in a given format
+#' Given a vector of dates this will try to parse them using vector of formats, and then parse them as best it can using information on if the other dates parse in a given format
 #'
 #' @param dts vector of strings
 #' @param fmts optional vector of formats to check
 #' @param check_func function that takes a date and returns true if if matches some business logic for a valid date
 #'
+#' @example
+#'  vector_parse_dates(dts=c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
 #' @export
+
 vector_parse_dates <- function(dts,
                               fmts = vector_parse_date_formats(),
                               check_func = vector_parse_date_not_future,
@@ -317,5 +354,5 @@ vector_parse_dates <- function(dts,
 
 }
 
-
-
+dts <- format(as.Date(sample( as.numeric(as.Date('2035-01-13')): as.numeric(as.Date('2035-01-31')), 5, replace = T), origin = '1970-01-01'), "%Y-%m-%d")
+vector_parse_dates(dts)

@@ -8,6 +8,8 @@ vector_parse_date_adust_year(dt, year_threshold = 1922)
 }
 \arguments{
 \item{dt}{a single string that may be a date}
+
+\item{year_threshold}{year where we will try to adjust by 100 years}
 }
 \description{
 adjust years of a date that are feed in

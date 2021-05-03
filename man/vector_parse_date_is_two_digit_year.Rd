@@ -2,10 +2,24 @@
 % Please edit documentation in R/vector_parse_date.R
 \name{vector_parse_date_is_two_digit_year}
 \alias{vector_parse_date_is_two_digit_year}
-\title{return true if it is 4 digit year}
+\title{Internal function return true if it is 4 digit year}
 \usage{
 vector_parse_date_is_two_digit_year(dt_str, fmt, sep = "-")
 }
+\arguments{
+\item{dt_str}{date string}
+
+\item{fmt}{format for the date string sometging like 'mdy'}
+
+\item{sep}{default separator}
+}
 \description{
-return true if it is 4 digit year
+Internal function return true if it is 4 digit year
+}
+\examples{
+vector_parse_date_is_two_digit_year(dt_str = "03-22-97", fmt = 'mdy')
+vector_parse_date_is_two_digit_year(dt_str = "03-22-1997", fmt = 'mdy')
+vector_parse_date_is_two_digit_year(dt_str = "2035-01-29", fmt = 'ymd')
+vector_parse_date_is_two_digit_year(dt_str = "35-01-29", fmt = 'ymd')
+
 }

@@ -15,6 +15,14 @@ vector_parse_date_only_one(
 \item{dt_str}{a single string that may be a date}
 
 \item{fmt}{a single format to try}
+
+\item{check_func}{function return 1 if the date parsed matches business logic}
+
+\item{...}{passed to check_func
+
+#' @example
+   vector_parse_date_only_one(dt_str="03/03/92", fmt="mdy")
+   vector_parse_date_only_one(dt_str="03/03/92", fmt="ymd")}
 }
 \description{
 returns either NA or a date depending on if the dt_str and fmt make sense as a possible date
