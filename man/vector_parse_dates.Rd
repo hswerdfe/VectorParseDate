@@ -2,7 +2,7 @@
 % Please edit documentation in R/vector_parse_date.R
 \name{vector_parse_dates}
 \alias{vector_parse_dates}
-\title{given a vector of dates this will try to parse them using vector of formats, and then parse them as best it can using information on if the other dates parse in a given format}
+\title{Given a vector of dates this will try to parse them using vector of formats, and then parse them as best it can using information on if the other dates parse in a given format}
 \usage{
 vector_parse_dates(
   dts,
@@ -19,5 +19,5 @@ vector_parse_dates(
 \item{check_func}{function that takes a date and returns true if if matches some business logic for a valid date}
 }
 \description{
-given a vector of dates this will try to parse them using vector of formats, and then parse them as best it can using information on if the other dates parse in a given format
+Given a vector of dates this will try to parse them using vector of formats, and then parse them as best it can using information on if the other dates parse in a given format
 }

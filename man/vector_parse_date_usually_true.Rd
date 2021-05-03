@@ -2,7 +2,8 @@
 % Please edit documentation in R/vector_parse_date.R
 \name{vector_parse_date_usually_true}
 \alias{vector_parse_date_usually_true}
-\title{always returns true}
+\title{Can be passed to multiple functions as the 'check_func' parameter,
+always returns true}
 \usage{
 vector_parse_date_usually_true(dt)
 }
@@ -10,5 +11,11 @@ vector_parse_date_usually_true(dt)
 \item{dt}{a POSIXct object}
 }
 \description{
+Can be passed to multiple functions as the 'check_func' parameter,
 always returns true
+}
+\examples{
+  vector_parse_date_usually_true(as.Date("2021-01-17"))
+  vector_parse_date_usually_true(as.Date("2037-01-17"))
+  vector_parse_date_usually_true(as.Date("1282-03-27"))
 }

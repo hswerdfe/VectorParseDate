@@ -15,7 +15,15 @@ vector_parse_date_possibl_correct_format(
 \item{dt_str}{a single string that may be a date}
 
 \item{fmt}{a single format to try}
+
+\item{check_func}{function return true if the date parsed matches business logic}
+
+\item{...}{passed to vector_parse_date_only_one}
 }
 \description{
 Return true if the string makes sense as a date in that format
+}
+\examples{
+   vector_parse_date_possibl_correct_format(dt_str="03/03/92", fmt="mdy")
+   vector_parse_date_possibl_correct_format(dt_str="03/03/92", fmt="ymd")
 }
