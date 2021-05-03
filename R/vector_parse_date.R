@@ -38,15 +38,16 @@ vector_parse_date_formats <- function(){
 #'
 #' @example
 #'  vector_parse_date_first_clean( c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
-#'
-#'
+#'  vector_parse_date_first_clean(dts = c("2018-11-01 08:30:00", "2017-09-19 08:30:00", "2017-02-28 08:30:00"), TIME_SPLIT = " ")
+#'  vector_parse_date_first_clean(dts = c("2018-11-01T08:30:00", "2017-09-19T08:30:00", "2017-02-28T08:30:00"), TIME_SPLIT = "T")
 #' @export
 vector_parse_date_first_clean <- function(dts,
                                           TIME_SPLIT = 'T',
                                           seps = '[-.:/\\s+]',
                                           replace_sep = "-"){
 
-  stringr::str_split(dts,pattern = TIME_SPLIT, n = 1) %>%
+  stringr::str_split(dts,pattern = TIME_SPLIT, n = 2) %>%
+    purrr::map(., 1)%>%
     unlist() %>%
     stringr::str_trim() %>%
     stringr::str_replace_all(pattern = seps, replacement = replace_sep)
@@ -158,11 +159,11 @@ vector_parse_date_is_two_digit_year <- function(dt_str, fmt, sep = "-"){
   return(year_a != year_b)
 }
 
-#' returns either NA or a date depending on if the dt_str and fmt make sense as a possible date
+#' Returns either NA or a date depending on if the dt_str and fmt make sense as a possible date
 #'
 #' @param dt_str a single string that may be a date
 #' @param fmt a single format to try
-#' @param check_func function return 1 if the date parsed matches business logic
+#' @param check_func function return 1 if the date parsed matches business logic, or a decimal for probability.
 #' @param ... passed to check_func
 #'
 #' #' @example
