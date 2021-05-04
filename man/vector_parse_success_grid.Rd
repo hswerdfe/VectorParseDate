@@ -8,6 +8,8 @@ vector_parse_success_grid(
   dts,
   fmts = vector_parse_date_formats(),
   check_func = vector_parse_date_not_future,
+  origin = "1970-01-01",
+  tz = "GMT",
   ...
 )
 }
@@ -17,7 +19,15 @@ vector_parse_success_grid(
 \item{fmts}{optional vector of formats to check}
 
 \item{check_func}{function that takes a date and returns 1 if if matches some business logic for a valid date}
+
+\item{origin}{passed to as.POSIXct}
+
+\item{tz}{passed to as.POSIXct}
 }
 \description{
 returns a wide tibble showing success or failure of each parsing format on each date
+}
+\examples{
+   vector_parse_success_grid(dts=c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
+
 }

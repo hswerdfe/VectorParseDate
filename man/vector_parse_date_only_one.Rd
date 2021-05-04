@@ -2,7 +2,7 @@
 % Please edit documentation in R/vector_parse_date.R
 \name{vector_parse_date_only_one}
 \alias{vector_parse_date_only_one}
-\title{Returns either NA or a date depending on if the dt_str and fmt make sense as a possible date}
+\title{Returns either NA or a date depending on if the dt_str and fmt make sense as a possible date, along with the business logic of check_func}
 \usage{
 vector_parse_date_only_one(
   dt_str,
@@ -25,5 +25,5 @@ vector_parse_date_only_one(
    vector_parse_date_only_one(dt_str="03/03/92", fmt="ymd")}
 }
 \description{
-Returns either NA or a date depending on if the dt_str and fmt make sense as a possible date
+Returns either NA or a date depending on if the dt_str and fmt make sense as a possible date, along with the business logic of check_func
 }

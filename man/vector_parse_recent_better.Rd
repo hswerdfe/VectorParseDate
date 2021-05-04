@@ -14,3 +14,7 @@ vector_parse_recent_better(dt)
 Can be passed to multiple functions as the 'check_func' parameter,
 Returns a larger number for dates closer to the current date
 }
+\examples{
+  vector_parse_recent_better(as.Date("2021-01-17"))
+
+}

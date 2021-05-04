@@ -6,8 +6,8 @@ NULL
 #' vector formats that will be attempted by default
 #'
 #'
-#' @example
-#' vector_parse_date_formats()
+#' @examples
+#'   vector_parse_date_formats()
 #'
 #'
 #'
@@ -36,7 +36,7 @@ vector_parse_date_formats <- function(){
 #' @param seps what the date separators might be
 #' @param replace_sep what to replace the seperators with
 #'
-#' @example
+#' @examples
 #'  vector_parse_date_first_clean( c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
 #'  vector_parse_date_first_clean(dts = c("2018-11-01 08:30:00", "2017-09-19 08:30:00", "2017-02-28 08:30:00"), TIME_SPLIT = " ")
 #'  vector_parse_date_first_clean(dts = c("2018-11-01T08:30:00", "2017-09-19T08:30:00", "2017-02-28T08:30:00"), TIME_SPLIT = "T")
@@ -94,7 +94,7 @@ vector_parse_date_not_future <- function(dt){
 #'
 #' @param dt  a POSIXct object
 #'
-#' @example
+#' @examples
 #'   vector_parse_recent_better(as.Date("2021-01-17"))
 #'
 #' @export
@@ -159,7 +159,7 @@ vector_parse_date_is_two_digit_year <- function(dt_str, fmt, sep = "-"){
   return(year_a != year_b)
 }
 
-#' Returns either NA or a date depending on if the dt_str and fmt make sense as a possible date
+#' Returns either NA or a date depending on if the dt_str and fmt make sense as a possible date, along with the business logic of check_func
 #'
 #' @param dt_str a single string that may be a date
 #' @param fmt a single format to try
@@ -232,13 +232,18 @@ vector_parse_date_possibl_correct_format <- function(dt_str, fmt, check_func = v
 #' @param dts vector of strings
 #' @param fmts optional vector of formats to check
 #' @param check_func function that takes a date and returns 1 if if matches some business logic for a valid date
-#' @example
+#' @param origin passed to as.POSIXct
+#' @param tz passed to as.POSIXct
+#'
+#' @examples
 #'    vector_parse_success_grid(dts=c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
 #'
 #' @export
 vector_parse_success_grid <- function(dts,
                                       fmts= vector_parse_date_formats(),
                                       check_func = vector_parse_date_not_future,
+                                      origin = "1970-01-01",
+                                      tz = "GMT",
                                       ...){
   #dts = c("2011/01/21", "2011/02/22", "2011/01/04", "2011/01/21", "Junk",       NA )
   dts_fmts <-
@@ -247,7 +252,7 @@ vector_parse_success_grid <- function(dts,
     dplyr::mutate(dts = vector_parse_date_first_clean(dts_orig))
 
   dts_fmts["valid_dts"] <-
-    as.POSIXct(purrr::map2(dts_fmts$dts, dts_fmts$fmt, vector_parse_date_only_one, check_func = check_func, ... = ...) %>% unlist(), origin = "1970-01-01", tz = "GMT")
+    as.POSIXct(purrr::map2(dts_fmts$dts, dts_fmts$fmt, vector_parse_date_only_one, check_func = check_func, ... = ...) %>% unlist(), origin = origin, tz = tz)
 
   dts_fmts["valid_fmt"] <-
     as.double(purrr::map2(dts_fmts$dts, dts_fmts$fmt, vector_parse_date_possibl_correct_format, check_func = check_func, ... = ...) %>% unlist())
@@ -264,13 +269,62 @@ vector_parse_success_grid <- function(dts,
 }
 
 
+
+
+#' returns a tibble with formats tried and success rate of format in aggregate
+#'
+#' @param dts vector of strings
+#' @param fmts optional vector of formats to check
+#' @param check_func optional function that takes a date and returns 1 if if matches some business logic for a valid date
+#' @param origin Origin for postix conversion
+#' @param tz timezone for postix conversion
+#' @param ... passed to vector_parse_date_only_one ,the nto check_func
+#'
+#'
+#'
+#' @examples
+#'  vector_parse_dates_guess_at_format_lazy(dts=c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
+#'
+#'
+#' @export
+vector_parse_dates_guess_at_format_lazy <- function(dts,
+                                                    fmts= vector_parse_date_formats(),
+                                                    check_func = vector_parse_date_not_future,
+                                                    origin = "1970-01-01",
+                                                    tz = "GMT",
+                                                    ...){
+  dts <- sample(dts)
+  fmts_cntr <- dplyr::tibble(fmts_nm = fmts, fmt_wrked = TRUE)
+  for (dt in dts){
+    fmts_cntr$fmt_wrked <- !
+    fmts_cntr$fmts_nm %>%
+      purrr::map (function(f){
+             vector_parse_date_only_one(dt_str = dt, fmt = f,  check_func = check_func, ...)
+          }) %>% unlist() %>%
+      as.POSIXct(origin = origin, tz = tz) %>%
+      is.na()
+
+    fmts_cntr <- fmts_cntr %>%
+      dplyr::filter(fmt_wrked == TRUE)
+
+    if (nrow(fmts_cntr) <= 1){
+      break
+    }
+  }
+
+  return(fmts_cntr$fmts_nm)
+}
+
+
+
+
 #' returns a tibble with formats tried and success rate of format in aggregate
 #'
 #' @param dts vector of strings
 #' @param fmts optional vector of formats to check
 #' @param check_func function that takes a date and returns 1 if if matches some business logic for a valid date
 #'
-#' @example
+#' @examples
 #'   vector_parse_success_rates(dts=c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
 #' @export
 vector_parse_success_rates <- function(dts,
@@ -280,6 +334,13 @@ vector_parse_success_rates <- function(dts,
   dts_fmts <-
     vector_parse_date_first_clean(dts) %>%
     tidyr::expand_grid(dts = ., fmt = fmts)
+
+
+  #no_cores <- detectCores(logical = TRUE)
+  #cl <- makeCluster(no_cores-1)
+  #registerDoParallel(cl)
+
+
 
   dts_fmts["valid_fmt"] <-
     purrr::map2(dts_fmts$dts, dts_fmts$fmt, vector_parse_date_possibl_correct_format, check_func = check_func, ... = ...) %>% unlist()
@@ -292,14 +353,13 @@ vector_parse_success_rates <- function(dts,
   return(fmts_summary)
 }
 
-
 #' returns a string for the best guess date, if there is no best guess it return an empty string
 #'
 #' @param dts vector of strings
 #' @param fmts optional vector of formats to check
 #' @param check_func function that takes a date and returns 1 if if matches some business logic for a valid date
 #'
-#' @example
+#' @examples
 #'   vector_parse_dates_guess_at_format(dts=c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
 #' @export
 vector_parse_dates_guess_at_format <- function(dts,
@@ -336,22 +396,35 @@ vector_parse_dates_guess_at_format <- function(dts,
 #' @param fmts optional vector of formats to check
 #' @param check_func function that takes a date and returns true if if matches some business logic for a valid date
 #' @param cleaning_args list of arguments passed on to vector_parse_dates_guess_at_format
+#' @param method optional how to guess either "lazy" or "regular"
+#' @param ... passed to other methods then eventually to check_func
 #'
 #' @examples
 #'  vector_parse_dates(dts=c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
 #'  vector_parse_dates(dts = c("2018-11-01 08:30:00", "2017-09-19 08:30:00", "2017-02-28 08:30:00"), cleaning_args = list(TIME_SPLIT = " "))
 #'  vector_parse_dates(dts = c("2018-11-01T08:30:00", "2017-09-19T08:30:00", "2017-02-28T08:30:00"))
+#'
+#'
+#'  dts <- cansim::list_cansim_tables() %>% pull(date_published)
+#'  vector_parse_dates(dts, cleaning_args = list(TIME_SPLIT = " " ))
 #' @export
 
 vector_parse_dates <- function(dts,
                               fmts = vector_parse_date_formats(),
                               check_func = vector_parse_date_not_future,
                               cleaning_args = list(),
+                              method = if (length(dts) > 100) {"lazy"} else {"regular"} ,
                               ...){
 
   cleaning_args[["dts"]] = dts
   dts_str <- do.call(vector_parse_date_first_clean, cleaning_args)
-  best_guess_format <- vector_parse_dates_guess_at_format(dts = dts_str, fmts = fmts, check_func = check_func,  ... = ...)
+
+  best_guess_format <-
+    if (method == "lazy"){
+      vector_parse_dates_guess_at_format_lazy(dts = dts_str, fmts = fmts, check_func = check_func,  ... = ...)
+    }else{
+      vector_parse_dates_guess_at_format(dts = dts_str, fmts = fmts, check_func = check_func,  ... = ...)
+    }
 
 
 
@@ -360,5 +433,3 @@ vector_parse_dates <- function(dts,
 
 }
 
-dts <- format(as.Date(sample( as.numeric(as.Date('2035-01-13')): as.numeric(as.Date('2035-01-31')), 5, replace = T), origin = '1970-01-01'), "%Y-%m-%d")
-vector_parse_dates(dts)

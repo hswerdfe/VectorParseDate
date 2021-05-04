@@ -23,3 +23,8 @@ vector_parse_date_first_clean(
 \description{
 cleans incoming dates a little bit so they are a little similar and we don't need to try as many formats
 }
+\examples{
+ vector_parse_date_first_clean( c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
+ vector_parse_date_first_clean(dts = c("2018-11-01 08:30:00", "2017-09-19 08:30:00", "2017-02-28 08:30:00"), TIME_SPLIT = " ")
+ vector_parse_date_first_clean(dts = c("2018-11-01T08:30:00", "2017-09-19T08:30:00", "2017-02-28T08:30:00"), TIME_SPLIT = "T")
+}

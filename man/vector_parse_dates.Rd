@@ -9,6 +9,7 @@ vector_parse_dates(
   fmts = vector_parse_date_formats(),
   check_func = vector_parse_date_not_future,
   cleaning_args = list(),
+  method = if (length(dts) > 100) {     "lazy" } else {     "regular" },
   ...
 )
 }
@@ -20,6 +21,10 @@ vector_parse_dates(
 \item{check_func}{function that takes a date and returns true if if matches some business logic for a valid date}
 
 \item{cleaning_args}{list of arguments passed on to vector_parse_dates_guess_at_format}
+
+\item{method}{optional how to guess either "lazy" or "regular"}
+
+\item{...}{passed to other methods then eventually to check_func}
 }
 \description{
 Given a vector of dates this will try to parse them using vector of formats, and then parse them as best it can using information on if the other dates parse in a given format
@@ -28,4 +33,8 @@ Given a vector of dates this will try to parse them using vector of formats, and
  vector_parse_dates(dts=c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
  vector_parse_dates(dts = c("2018-11-01 08:30:00", "2017-09-19 08:30:00", "2017-02-28 08:30:00"), cleaning_args = list(TIME_SPLIT = " "))
  vector_parse_dates(dts = c("2018-11-01T08:30:00", "2017-09-19T08:30:00", "2017-02-28T08:30:00"))
+
+
+ dts <- cansim::list_cansim_tables() \%>\% pull(date_published)
+ vector_parse_dates(dts, cleaning_args = list(TIME_SPLIT = " " ))
 }

@@ -9,3 +9,9 @@ vector_parse_date_formats()
 \description{
 vector formats that will be attempted by default
 }
+\examples{
+  vector_parse_date_formats()
+
+
+
+}

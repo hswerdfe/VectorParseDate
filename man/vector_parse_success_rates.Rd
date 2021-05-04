@@ -21,3 +21,6 @@ vector_parse_success_rates(
 \description{
 returns a tibble with formats tried and success rate of format in aggregate
 }
+\examples{
+  vector_parse_success_rates(dts=c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
+}

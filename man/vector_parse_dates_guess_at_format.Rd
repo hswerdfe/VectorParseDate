@@ -21,3 +21,6 @@ vector_parse_dates_guess_at_format(
 \description{
 returns a string for the best guess date, if there is no best guess it return an empty string
 }
+\examples{
+  vector_parse_dates_guess_at_format(dts=c("03/03/92", "03/21/94", "03/02/99", "03/07/02"))
+}
