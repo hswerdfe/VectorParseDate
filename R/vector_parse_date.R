@@ -9,8 +9,6 @@ NULL
 #' @examples
 #'   vector_parse_date_formats()
 #'
-#'
-#'
 #' @export
 vector_parse_date_formats <- function(){
   unique(c(
@@ -85,6 +83,27 @@ vector_parse_date_not_future <- function(dt){
   return(as.double(dt <= Sys.Date()))
 }
 
+#' Can be passed to multiple functions as the 'check_func' parameter,
+#' true if the date is in the past 120 years
+#'
+#' @param dt a POSIXct object
+#'
+#' @examples
+#'   vector_parse_date_last_120_yr(as.Date("2021-01-17"))
+#'   vector_parse_date_last_120_yr(as.Date("2037-01-17"))
+#'   vector_parse_date_last_120_yr(as.Date("0473-7-12"))
+#' @export
+vector_parse_date_last_120_yr <- function(dt){
+  #dt = lubridate::parse_date_time('2010-03-14', 'Ymd')
+  ret_val <- as.double(dt <= Sys.Date()) & dt >= Sys.Date() - lubridate::years(100)
+  return(ret_val)
+}
+
+
+
+
+
+
 
 
 
@@ -132,6 +151,7 @@ vector_parse_date_adust_year <- function(dt, year_threshold=1922){
 #' vector_parse_date_is_two_digit_year(dt_str = "03-22-1997", fmt = 'mdy')
 #' vector_parse_date_is_two_digit_year(dt_str = "2035-01-29", fmt = 'ymd')
 #' vector_parse_date_is_two_digit_year(dt_str = "35-01-29", fmt = 'ymd')
+#' vector_parse_date_is_two_digit_year(dt_str = "20110401", fmt = 'ymd')
 #'
 #'@export
 vector_parse_date_is_two_digit_year <- function(dt_str, fmt, sep = "-"){
@@ -139,6 +159,10 @@ vector_parse_date_is_two_digit_year <- function(dt_str, fmt, sep = "-"){
   dt_str <- vector_parse_date_first_clean(dt_str)
 
   index_of_year = stringr::str_locate_all(pattern ="y", string = fmt)[[1]][[1]]
+
+  if (stringr::str_count(dt_str, pattern = sep) == 0){
+    return(FALSE)
+  }
 
   year_a <-
     tryCatch(
@@ -169,7 +193,7 @@ vector_parse_date_is_two_digit_year <- function(dt_str, fmt, sep = "-"){
 #' #' @example
 #'    vector_parse_date_only_one(dt_str="03/03/92", fmt="mdy")
 #'    vector_parse_date_only_one(dt_str="03/03/92", fmt="ymd")
-#'
+#'    vector_parse_date_only_one(dt_str="20110401", fmt = "dmy", check_func =vector_parse_date_last_120_yr )
 #' @export
 vector_parse_date_only_one <- function(dt_str, fmt, check_func = vector_parse_date_not_future, ...){
   #dt_str = "2010-03-14"
@@ -226,6 +250,11 @@ vector_parse_date_possibl_correct_format <- function(dt_str, fmt, check_func = v
   }
   return (check_func(dt = ret_dt, ...))
 }
+
+
+
+
+
 
 #' returns a wide tibble showing success or failure of each parsing format on each date
 #'
@@ -390,6 +419,7 @@ vector_parse_dates_guess_at_format <- function(dts,
 
 
 
+
 #' Given a vector of dates this will try to parse them using vector of formats, and then parse them as best it can using information on if the other dates parse in a given format
 #'
 #' @param dts vector of strings
@@ -408,13 +438,22 @@ vector_parse_dates_guess_at_format <- function(dts,
 #'  dts <- cansim::list_cansim_tables() %>% pull(date_published)
 #'  vector_parse_dates(dts, cleaning_args = list(TIME_SPLIT = " " ))
 #' @export
-
 vector_parse_dates <- function(dts,
                               fmts = vector_parse_date_formats(),
                               check_func = vector_parse_date_not_future,
                               cleaning_args = list(),
-                              method = if (length(dts) > 100) {"lazy"} else {"regular"} ,
+                              method =NULL,
                               ...){
+
+  if (is.null(method)){
+    method <-
+      if (length(dts) > 100) {"lazy"
+      #}else if (TRUE) {"sample"
+      }else {"regular"
+      }
+
+  }
+
 
   cleaning_args[["dts"]] = dts
   dts_str <- do.call(vector_parse_date_first_clean, cleaning_args)

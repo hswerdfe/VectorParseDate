@@ -9,7 +9,7 @@ vector_parse_dates(
   fmts = vector_parse_date_formats(),
   check_func = vector_parse_date_not_future,
   cleaning_args = list(),
-  method = if (length(dts) > 100) {     "lazy" } else {     "regular" },
+  method = NULL,
   ...
 )
 }

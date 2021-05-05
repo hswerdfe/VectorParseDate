@@ -22,7 +22,8 @@ vector_parse_date_only_one(
 
 #' @example
    vector_parse_date_only_one(dt_str="03/03/92", fmt="mdy")
-   vector_parse_date_only_one(dt_str="03/03/92", fmt="ymd")}
+   vector_parse_date_only_one(dt_str="03/03/92", fmt="ymd")
+   vector_parse_date_only_one(dt_str="20110401", fmt = "dmy", check_func =vector_parse_date_last_120_yr )}
 }
 \description{
 Returns either NA or a date depending on if the dt_str and fmt make sense as a possible date, along with the business logic of check_func

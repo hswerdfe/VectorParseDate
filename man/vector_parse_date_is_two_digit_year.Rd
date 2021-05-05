@@ -21,5 +21,6 @@ vector_parse_date_is_two_digit_year(dt_str = "03-22-97", fmt = 'mdy')
 vector_parse_date_is_two_digit_year(dt_str = "03-22-1997", fmt = 'mdy')
 vector_parse_date_is_two_digit_year(dt_str = "2035-01-29", fmt = 'ymd')
 vector_parse_date_is_two_digit_year(dt_str = "35-01-29", fmt = 'ymd')
+vector_parse_date_is_two_digit_year(dt_str = "20110401", fmt = 'ymd')
 
 }

@@ -1,7 +1,4 @@
 library(testthat)
-library(vectorParseDate)
+library(VectorParseDate)
 
-test_check("vectorParseDate")
-
-
-
+test_check("VectorParseDate")
